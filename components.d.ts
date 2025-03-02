@@ -7,6 +7,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AccountList: typeof import('./src/components/AccountList.vue')['default']
+    CreateAccountDialog: typeof import('./src/components/CreateAccountDialog.vue')['default']
+    CreateAccountForm: typeof import('./src/components/CreateAccountForm.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
   }
 }

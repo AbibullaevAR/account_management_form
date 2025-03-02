@@ -1,17 +1,17 @@
 <template>
-  <v-app>
+  <v-app theme="light">
     <v-main>
-      <v-text-field
-        :rules="rules"
-        hide-details="auto"
-        label="Main input"
-      ></v-text-field>
+      <create-account-dialog v-model:modal-value="showCreateAccountDialog" />
+      <account-list @create-new-account="showCreateAccountDialog = true" />
     </v-main>
   </v-app>
 </template>
 
 <script setup lang="ts">
-  const rules = [
-    (value: string) => !!value,
-  ]
+import { ref } from 'vue';
+import CreateAccountDialog from '@/components/CreateAccountDialog.vue';
+import AccountList from '@/components/AccountList.vue';
+
+const showCreateAccountDialog = ref(false);
+
 </script>
