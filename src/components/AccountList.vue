@@ -3,46 +3,46 @@
     <v-card class="pa-4">
       <v-card-title class="d-flex justify-space-between align-center">
         Управление учетными записями
-        <v-btn color="primary" @click="emit('createNewAccount')">+</v-btn>
+        <v-btn color="primary" @click="handelAddNewAccount">+</v-btn>
       </v-card-title>
       <v-card-text>
         <v-list>
-          <v-list-item v-for="account in accounts" :key="account.id">
+          <v-list-item v-for="(account, index) in accounts" :key="index">
             <v-row justify="center">
               <v-col cols="3">
                 <v-text-field
-                  :value="account.label.join(';')"
+                  :model-value="convertArrLabelsToString(account)"
                   label="Метка"
-                  :rules="[v => v.length <= 50 || 'Максимум 50 символов']"
+                  @update:model-value="(value) => handelUpdateLabel(account, value)"
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
                 <v-select
-                  v-model="account.type"
+                  :model-value="account.type"
                   :items="['LDAP', 'Локальная']"
                   label="Тип записи"
-                 
+                  @update:model-value="(value) => handelUpdateAccountType(account, value)"
                 ></v-select>
               </v-col>
               <v-col cols="3">
                 <v-text-field
-                  v-model="account.login"
+                  :model-value="account.login"
                   label="Логин"
-                  :rules="[v => !!v || 'Обязательное поле', v => v.length <= 100 || 'Максимум 100 символов']"
                   
+                  @update:model-value="(value) => handelUpdateLogin(account, value)"
                 ></v-text-field>
               </v-col>
               <v-col cols="3" v-if="account.type === 'Локальная'">
                 <v-text-field
-                  v-model="account.password"
+                  :model-value="account.password"
                   label="Пароль"
                   type="password"
-                  :rules="[v => !!v || 'Обязательное поле', v => v.length <= 100 || 'Максимум 100 символов']"
                   
+                   @update:model-value="(value) => handelUpdatePassword(account, value)"
                 ></v-text-field>
               </v-col>
               <v-col cols="1">
-                <v-btn color="red">Удалить</v-btn>
+                <v-btn color="red" @click="handelDeleteAccount(index)">Удалить</v-btn>
               </v-col>
             </v-row>
           </v-list-item>
@@ -53,32 +53,67 @@
 </template>
 
 <script setup lang="ts">
+import { useAccountStore } from '@/stores/account';
+import type { Account, AccountType } from '@/stores/types';
+import { ref } from 'vue';
 
-const emit = defineEmits<{
-  (e: 'createNewAccount'): void
-}>();
+const accountStore = useAccountStore();
 
-const accounts = [
-  {
-    id: 0,
-    label: ['1234', 'test'],
+const accounts = ref(accountStore.accounts);
+
+const convertArrLabelsToString = (account: Account) => {
+  return account.label.map(item => item.text).join(';');
+}
+
+const saveToStore = () => {
+  const savingAccounts = accounts.value.filter(item => item.type === 'LDAP' || item.password && item.login);
+
+  accountStore.saveAccounts(savingAccounts);
+}
+
+const handelUpdateLabel = (account: Account, strLabel: string) => {
+  account.label = strLabel.split(';').map(label => {
+    return {
+      text: label
+    }
+  });
+
+  saveToStore();
+}
+
+const handelUpdateAccountType = (account: Account, accountType: AccountType) => {
+  if (accountType === 'LDAP') account.password = null;
+
+  account.type = accountType;
+
+  saveToStore();
+}
+
+const handelUpdateLogin = (account: Account, login: string) => {
+  account.login = login;
+  
+  saveToStore();
+}
+
+const handelUpdatePassword = (account: Account, password: string) => {
+  account.password = password;
+
+  saveToStore();
+}
+
+const handelDeleteAccount = (deletedIndex: number) => {
+  accounts.value = accounts.value.filter((_, index) => index !== deletedIndex);
+
+  saveToStore();
+}
+
+const handelAddNewAccount = () => {
+  accounts.value.push({
+    label: [],
     type: 'Локальная',
-    login: 'tttt',
-    password: 't',
-  },
-  {
-    id: 1,
-    label: ['1234', 'test'],
-    type: 'Локальная',
-    login: 'tttt',
-    password: 't',
-  },
-  {
-    id: 2,
-    label: ['1234', 'test'],
-    type: 'Локальная',
-    login: 'tttt',
-    password: 't',
-  }
-]
+    login: '',
+    password: ''
+  })
+}
+
 </script>
