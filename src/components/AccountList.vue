@@ -30,7 +30,7 @@
                   @update:model-value="(value) => handelUpdateAccountType(account, value)"
                 ></v-select>
               </v-col>
-              <v-col cols="3">
+              <v-col :cols="account.type === 'LDAP' ? 6 : 3">
                 <v-text-field
                   :model-value="account.login"
                   label="Логин"
