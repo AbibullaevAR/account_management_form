@@ -18,6 +18,7 @@
                 <v-text-field
                   :model-value="convertArrLabelsToString(account)"
                   label="Метка"
+                  :rules="[v => v.length <= 50 || 'Максимум 50 символов']"
                   @update:model-value="(value) => handelUpdateLabel(account, value)"
                 ></v-text-field>
               </v-col>
@@ -33,7 +34,7 @@
                 <v-text-field
                   :model-value="account.login"
                   label="Логин"
-                  
+                  :rules="[v => !!v || 'Обязательное поле', v => v.length <= 100 || 'Максимум 100 символов']"
                   @update:model-value="(value) => handelUpdateLogin(account, value)"
                 ></v-text-field>
               </v-col>
@@ -42,8 +43,8 @@
                   :model-value="account.password"
                   label="Пароль"
                   type="password"
-                  
-                   @update:model-value="(value) => handelUpdatePassword(account, value)"
+                  :rules="[v => !!v || 'Обязательное поле', v => v.length <= 100 || 'Максимум 100 символов']"
+                  @update:model-value="(value) => handelUpdatePassword(account, value)"
                 ></v-text-field>
               </v-col>
               <v-col cols="1">
@@ -71,7 +72,7 @@ const convertArrLabelsToString = (account: Account) => {
 }
 
 const saveToStore = () => {
-  const savingAccounts = accounts.value.filter(item => item.type === 'LDAP' || item.password && item.login);
+  const savingAccounts = accounts.value.filter(item => (item.type === 'LDAP' || item.password?.length) && item.login.length);
 
   accountStore.saveAccounts(savingAccounts);
 }
