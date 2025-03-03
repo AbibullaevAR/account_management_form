@@ -9,7 +9,12 @@
         <v-list>
           <v-list-item v-for="(account, index) in accounts" :key="index">
             <v-row justify="center">
-              <v-col cols="3">
+              <v-col cols="3" style="display: flex; align-items: center;">
+                <v-tooltip text="Для указания нескольких меток для одной пары логин/пароль используйте разделитель ;">
+                  <template v-slot:activator="{ props }">
+                    <v-icon v-bind="props" class="ml-2">mdi-help-circle-outline</v-icon>
+                  </template>
+                </v-tooltip>
                 <v-text-field
                   :model-value="convertArrLabelsToString(account)"
                   label="Метка"
